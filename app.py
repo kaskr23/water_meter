@@ -118,27 +118,34 @@ def upload():
 
 def run_ocr_on_image(img):
     """
-    Run OCR on the part of the image where the meter digits are.
-    This uses a simple center crop – adjust ratios for your setup!
+    Run OCR on the image.
+    For now, use the FULL frame and save debug images so we can see
+    what Tesseract is looking at.
+    Later we can crop (ROI) once we see where the digits are.
     """
     h, w, _ = img.shape
+    print("Image size for OCR:", w, "x", h)
 
-    # ---- ROI: adjust these based on how your counter looks ----
-    x1 = int(w * 0.20)
-    x2 = int(w * 0.80)
-    y1 = int(h * 0.30)
-    y2 = int(h * 0.80)
-    roi = img[y1:y2, x1:x2]
+    # 🔹 TEMP: use full image as ROI for debugging
+    roi = img
 
+    # Save raw ROI to inspect
+    cv2.imwrite("/tmp/roi.jpg", roi)
+
+    # Grayscale + blur + threshold
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
     _, thresh = cv2.threshold(
         gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
-    # If your digits are white on black, invert:
+
+    # If digits are white on black and you get bad results,
+    # try inverting:
     # thresh = cv2.bitwise_not(thresh)
 
-    # OCR with digits only
+    cv2.imwrite("/tmp/thresh.jpg", thresh)
+
+    # OCR config: digits only, assume single line
     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     text = pytesseract.image_to_string(thresh, config=config)
     raw = text.strip()
@@ -146,7 +153,6 @@ def run_ocr_on_image(img):
 
     print("OCR raw:", repr(raw), "digits:", digits)
     return digits or None
-
 
 def append_reading(timestamp, reading, ip):
     file_exists = os.path.exists(READINGS_CSV)
@@ -190,4 +196,5 @@ def log_readings():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
