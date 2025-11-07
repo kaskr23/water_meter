@@ -191,10 +191,25 @@ def log_readings():
         as_attachment=True,
         download_name="readings.csv",
     )
+@app.route("/debug/roi")
+def debug_roi():
+    path = "/tmp/roi.jpg"
+    if not os.path.exists(path):
+        return "❌ No ROI image yet", 404
+    return send_file(path, mimetype="image/jpeg")
+
+
+@app.route("/debug/thresh")
+def debug_thresh():
+    path = "/tmp/thresh.jpg"
+    if not os.path.exists(path):
+        return "❌ No thresh image yet", 404
+    return send_file(path, mimetype="image/jpeg")
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
