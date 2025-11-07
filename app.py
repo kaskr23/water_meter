@@ -21,9 +21,8 @@ LAST_IMG_PATH = "/tmp/last_upload.jpg"
 READINGS_CSV = "/tmp/readings.csv"
 IMAGE_LOG_CSV = "/tmp/image_log.csv"
 
-# In Docker, tesseract is installed in PATH, so default works.
-# If you want to be explicit:
-# pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+print("✅ Using tesseract at:", pytesseract.pytesseract.tesseract_cmd)
 
 
 @app.route("/")
@@ -191,3 +190,4 @@ def log_readings():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
