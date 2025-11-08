@@ -1,5 +1,4 @@
 Flask
-numpy
-opencv-python-headless
-pytesseract
 ultralytics
+opencv-python-headless
+numpy
